@@ -38,6 +38,8 @@ int main() {
         exit(1);
     }
 
+
+    
     // 3️⃣ Créer la chaîne à envoyer
     // const char message[] = "HELLO I2C!";
     unsigned char buffer[32] = {0}; // taille max du message
