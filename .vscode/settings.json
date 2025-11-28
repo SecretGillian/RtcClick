@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "rtc.h": "c",
+        "main.h": "c",
+        "unistd.h": "c"
+    },
+    "C_Cpp.default.compilerPath": "c:\\Program Files (x86)\\Arm GNU Toolchain aarch64-none-linux-gnu\\14.3 rel1\\bin\\aarch64-none-linux-gnu-gcc.exe"
+}
