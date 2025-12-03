@@ -10,8 +10,9 @@
     #include <stdint.h>
     #include <time.h>
 
-    #define NbrTimeElement 5
-
+    #define NBR_TIME_ELEMENT    5
+    #define MODUL_ADDR          0x50
+    #define TIME_REGISTER_ADDR  0X02
     union RtcValue {
         uint8_t m_uint8_val;
         struct
@@ -23,7 +24,7 @@
 
     union TimeVal
     {
-        uint8_t m_RtcValue_Tab[NbrTimeElement];
+        uint8_t m_aRtcValue_Tab[NBR_TIME_ELEMENT];
         struct
         {
             union RtcValue m_RtcValue_sec;
