@@ -13,6 +13,8 @@
     #define NBR_TIME_ELEMENT    5
     #define MODUL_ADDR          0x50
     #define TIME_REGISTER_ADDR  0X02
+    #define MSG_CONF_SIZE       2
+    #define TIME_MSG_SIZE       NBR_TIME_ELEMENT
     union RtcValue {
         uint8_t m_uint8_val;
         struct
@@ -37,5 +39,6 @@
     
 
     void InitRTC(void);
-    
+    union TimeVal GetTimeRTC(void);
+
 #endif
