@@ -67,7 +67,7 @@ union TimeVal GetTimeRTC(void)
     }
 
     l_int8_return = read(l_int_file, &l_TimeVal_TimeVal.m_aRtcValue_Tab[1], TIME_MSG_SIZE - 1); //lecture des valeur renvoyer par la RTC
-    if  (l_int8_return != TIME_MSG_SIZE)
+    if  (l_int8_return != TIME_MSG_SIZE - 1)
     {
         perror("Erreur lecture I2C");
         for(uint8_t i = 0 ; i < NBR_TIME_ELEMENT ; i++)
@@ -77,6 +77,12 @@ union TimeVal GetTimeRTC(void)
         return l_TimeVal_TimeVal;
     }else
     {
+        l_TimeVal_TimeVal.m_RtcValue_sec.m_uint8_val = l_TimeVal_TimeVal.m_RtcValue_sec.m_uint4_unite + l_TimeVal_TimeVal.m_RtcValue_sec.m_uint4_dizaine * 10;
+        l_TimeVal_TimeVal.m_RtcValue_min.m_uint8_val = l_TimeVal_TimeVal.m_RtcValue_min.m_uint4_unite + l_TimeVal_TimeVal.m_RtcValue_min.m_uint4_dizaine * 10;
+        l_TimeVal_TimeVal.m_RtcValue_hour.m_uint8_val = l_TimeVal_TimeVal.m_RtcValue_hour.m_uint4_unite + l_TimeVal_TimeVal.m_RtcValue_hour.m_uint4_dizaine * 10;
+        l_TimeVal_TimeVal.m_RtcValue_mDay.m_uint8_val = l_TimeVal_TimeVal.m_RtcValue_mDay.m_uint4_unite + l_TimeVal_TimeVal.m_RtcValue_mDay.m_uint4_dizaine * 10;
+        l_TimeVal_TimeVal.m_RtcValue_mon.m_uint8_val = l_TimeVal_TimeVal.m_RtcValue_mon.m_uint4_unite + l_TimeVal_TimeVal.m_RtcValue_mon.m_uint4_dizaine * 10;
+        
         return l_TimeVal_TimeVal;
     }
 }

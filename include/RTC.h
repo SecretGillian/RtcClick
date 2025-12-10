@@ -9,6 +9,7 @@
     #include <linux/i2c-dev.h>
     #include <stdint.h>
     #include <time.h>
+    #include <sys/time.h>
 
     #define NBR_TIME_ELEMENT    6
     #define MODUL_ADDR          0x50
