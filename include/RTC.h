@@ -39,8 +39,13 @@
         };
     };
     
+//     1 si le fichier du periférique I2C n'a pas pu aitre ouvert,
+//  * 2 si l'esclave n'a pas pu aitre ransangner,
+//  * 3 si il y a u une erreur lors de l'envois de la requet ou
+//  * 4 si il y a u une erreur lors de la réseption des valeurs
+    enum ERREUR{OPEN_FILE_ERROR, SET_SLAVE_ERROR, SEND_VALUE_ERROR, RECEIVE_VALUE_ERROR, NO_ERROR};
 
-    void InitRTC(void);
+    uint8_t InitRTC(void);
     union TimeVal GetTimeRTC(void);
     void SetTimeRTC(union TimeVal x_TimeVal_SetVal);
 
