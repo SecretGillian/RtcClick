@@ -12,16 +12,33 @@ int main(void)
     time_t l_time_TimeVal               = 0;
     struct tm* l_pTm_temps;
     struct stat st;
-    const char *file                    = "/run/systemd/timesync/synchronized";
+    const char file[]                   = "/run/systemd/timesync/synchronized";
 
-    uint32_t l_uint32_delta               = 0;
+    uint32_t l_uint32_delta             = 0;
     uint8_t l_uint8_Test                = 0;
 
     FILE* l_PtrFILE_DebugFile           = NULL;
     const char l_str_FilePath[]         = "/home/user/Sys/DebugUpdateRTC.txt";
-    const char l_str_mode[]             = "w";
+    const char l_str_mode1[]            = "w";//ouverture en écriture (écrase le fichier existant)
+    const char l_str_mode2[]            = "a";//ouverture en ajout (ajoute à la fin du fichier)
+    char const* l_str_mode              = l_str_mode2;
 
-    const char path[] = "/run/systemd/timesync/synchronized";
+    union TimeVal l_TimeVal_GetRtcVal    = {.m_aRtcValue_Tab = {0}};
+
+
+    /**/ //récupération de l'heur de la RTC
+    l_TimeVal_GetRtcVal = GetTimeRTC();
+    /**/
+
+    /**/    //vérifie la taille du fichier de debug pour choisir le mode d'ouverture
+    if(stat(l_str_FilePath, &st) == 0)
+    {
+        if(st.st_size >= MAX_SIZE_DEBUG_FILE)
+        {
+            l_str_mode = (char*)l_str_mode1;
+        }
+    }
+    /**/
 
     /**/ //ouverture du fichier de debug
     do
@@ -37,10 +54,11 @@ int main(void)
     }
     /**/
 
+    fprintf(l_PtrFILE_DebugFile, "\n\n");
 
     if (stat(file, &st) != 0) {
         // perror("stat");
-        fprintf(l_PtrFILE_DebugFile, "Erreur stat: %s\n", strerror(errno));
+        fprintf(l_PtrFILE_DebugFile, TimePatern "Erreur stat: %s\n", Time(l_TimeVal_GetRtcVal), strerror(errno));
         fclose(l_PtrFILE_DebugFile);
         return 2;
     }
@@ -50,10 +68,10 @@ int main(void)
     l_uint32_delta = (uint32_t)difftime(l_time_TimeVal, st.st_mtime);
     /**/
 
-    fprintf(l_PtrFILE_DebugFile, "Delta temps depuis dernière synchro NTP: %u minute %u secondes\n", l_uint32_delta / 60, l_uint32_delta % 60);
+    fprintf(l_PtrFILE_DebugFile, TimePatern "Delta temps depuis dernière synchro NTP: %u minute %u secondes\n", Time(l_TimeVal_GetRtcVal), l_uint32_delta / 60, l_uint32_delta % 60);
 
     if (l_uint32_delta < MAX_TIME_NTP_SYNC) {
-        fprintf(l_PtrFILE_DebugFile, "Synchronisation NTP récente\n");
+        fprintf(l_PtrFILE_DebugFile, TimePatern "Synchronisation NTP récente\n", Time(l_TimeVal_GetRtcVal));
 
         /**/ // récupération de l'heure système
         l_pTm_temps = localtime(&l_time_TimeVal);
@@ -71,28 +89,28 @@ int main(void)
         SetTimeRTC(l_TimeVal_SetRtcVal);
 
         /**/ // suppression du fichier de validation de synchronisation NTP
-        if (unlink(path) != 0) {
+        if (unlink(file) != 0) {
             if (errno == ENOENT) {
-                fprintf(l_PtrFILE_DebugFile, "Le fichier n'existe pas\n");
+                fprintf(l_PtrFILE_DebugFile, TimePatern "Le fichier n'existe pas\n", Time(l_TimeVal_GetRtcVal));
                 fclose(l_PtrFILE_DebugFile);
                 return 3;
             } else if (errno == EACCES || errno == EPERM) {
-                fprintf(l_PtrFILE_DebugFile, "Permission refusée: %s\n" , strerror(errno));
+                fprintf(l_PtrFILE_DebugFile, TimePatern "Permission refusée: %s\n" , Time(l_TimeVal_GetRtcVal), strerror(errno));
                 fclose(l_PtrFILE_DebugFile);
                 return 4;
             } else {
-                fprintf(l_PtrFILE_DebugFile, "Erreur unlink: %s\n", strerror(errno));
+                fprintf(l_PtrFILE_DebugFile, TimePatern "Erreur unlink: %s\n", Time(l_TimeVal_GetRtcVal), strerror(errno));
                 fclose(l_PtrFILE_DebugFile);
                 return 5;
             }
         }/**/
 
-        fprintf(l_PtrFILE_DebugFile, "Fichier supprimé avec succès\n");
+        fprintf(l_PtrFILE_DebugFile, TimePatern "Fichier supprimé avec succès\n", Time(l_TimeVal_GetRtcVal));
 
         fclose(l_PtrFILE_DebugFile);
         return 0;
     } else {
-        fprintf(l_PtrFILE_DebugFile, "Synchronisation NTP ancienne ou perdue\n");
+        fprintf(l_PtrFILE_DebugFile, TimePatern "Synchronisation NTP ancienne ou perdue\n", Time(l_TimeVal_GetRtcVal));
         fclose(l_PtrFILE_DebugFile);
         return 6;
     }
