@@ -27,22 +27,66 @@ int main() {
 
 #include <unistd.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <string.h>
+
+#define BUFFER_SIZE 22
 
 int main() {
-    const char *path = "/home/user/test_i2c/test.txt"/* "/run/systemd/timesync/synchronized" */;
+    const char *path = "test.txt"/* "/run/systemd/timesync/synchronized" */;
+    FILE* l_PtrFILE_TimeFile    = NULL;
 
-    if (unlink(path) == 0) {
-        printf("Fichier supprimé avec succès\n");
-    } else {
-        if (errno == ENOENT) {
-            printf("Le fichier n'existe pas\n");
-        } else if (errno == EACCES || errno == EPERM) {
-            perror("Permission refusée");
-        } else {
-            perror("Erreur unlink");
-        }
+    uint8_t l_uint8_Test        = 0;
+
+    // struct stat st;
+    char l_str_Buffer[BUFFER_SIZE]       = {0};
+    char l_str_Date[BUFFER_SIZE]         = {0};
+    
+
+    do
+    {
+        l_PtrFILE_TimeFile = fopen(path, "w");
+
+        l_uint8_Test++;
+    } while (l_PtrFILE_TimeFile == NULL && l_uint8_Test <= 200);
+
+    if(l_PtrFILE_TimeFile == NULL)
+    {
+        perror("fopen");
+        return 1;
     }
+
+    fprintf(l_PtrFILE_TimeFile, "27/03/2026 14:46:56\n");
+    fprintf(l_PtrFILE_TimeFile, "27/03/2026 15:46:56\n");
+    fprintf(l_PtrFILE_TimeFile, "27/03/2026 16:46:56\n");
+    fprintf(l_PtrFILE_TimeFile, "27/03/2026 17:46:56\n");
+    fclose(l_PtrFILE_TimeFile);
+
+    do
+    {
+        l_PtrFILE_TimeFile = fopen(path, "r");
+
+        l_uint8_Test++;
+    } while (l_PtrFILE_TimeFile == NULL && l_uint8_Test <= 200);
+
+    if(l_PtrFILE_TimeFile == NULL)
+    {
+        perror("fopen");
+        return 1;
+    }
+
+
+    while (fgets(l_str_Buffer, BUFFER_SIZE, l_PtrFILE_TimeFile) != NULL);
+    
+    // printf("test\n");
+    // printf("Ligne lue : %s\n\r", l_str_Buffer);
+    strcpy(l_str_Date, l_str_Buffer);
+    printf("Ligne copiée : %s\n\r", l_str_Date);
+    
+    
+    printf("Dernière ligne lue : %s\n", l_str_Date);
 
     return 0;
 }
